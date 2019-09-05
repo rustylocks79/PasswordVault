@@ -15,6 +15,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println(generateRandomPassword());
+        int result = InputHelper.optionMenu("Open file", "New File", "ELSE");
+        if(result == 2) {
+            System.out.println(generateRandomPassword());
+        }
     }
 }
