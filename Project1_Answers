@@ -1,0 +1,25 @@
+Ben Warner, Emily Haigh, Jeremy Dellock
+CMPSC 444
+
+1) What are the assets that your program should protect?
+
+    The Usernames and Passwords stored by the user
+
+2) What are the security goals for these assets?
+
+    Confidentiality, Integrity, and Availability
+
+3) What are potential adversaries?
+
+    answer...
+
+4) What are the vulnerabilities for your vault, as it is currently designed and implemented?  (Limit to 1 page).
+
+    answer...
+
+5) How might the risk that you face change over time?  Specifically address the two components of risk.
+
+    Both aspects of risk will increase over time. Probability of an attack will increase because as the vault
+    is used there is a higher chance a potential attacker will know about it. Impact of an attack will also
+    increase over time because the number of passwords stored in the vault will continue to increase,
+    meaning that anyone who gains access will have far more information available to them
