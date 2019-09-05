@@ -1,4 +1,6 @@
+import java.io.File;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Main {
     private static int MAX_PASSWORD_LENGTH = 20;
@@ -15,9 +17,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        int result = InputHelper.optionMenu("Open file", "New File", "ELSE");
-        if(result == 2) {
-            System.out.println(generateRandomPassword());
+        int result = -1;
+        Scanner scanner = new Scanner(System.in);
+        User user = null;
+        File file = new File("C:\\rar.txt");
+        if(file.exists()) {
+            user = new User(file);
+        } else {
+            user = new User("password");
         }
+        result = InputHelper.optionMenu("Reset Master Password", "Add Account");
+
+        user.saveToFile(file);
     }
 }
