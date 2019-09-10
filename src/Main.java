@@ -1,4 +1,8 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -20,14 +24,16 @@ public class Main {
         int result = -1;
         Scanner scanner = new Scanner(System.in);
         User user = null;
-        File file = new File("C:\\rar.txt");
+        URL url = Main.class.getResource("save.txt");
+        File file = new File(url.getPath());
         if(file.exists()) {
             user = new User(file);
         } else {
             user = new User("password");
         }
-        result = InputHelper.optionMenu("Reset Master Password", "Add Account");
+        System.out.println(user.getMasterPassword().equals("password"));
 
+        //result = InputHelper.optionMenu("Reset Master Password", "Add Account");
         user.saveToFile(file);
     }
 }
