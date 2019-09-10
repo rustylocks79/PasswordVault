@@ -3,11 +3,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class User {
-    private String password;
+    private String masterPassword;
     private ArrayList<Account> accounts = new ArrayList<>();
 
-    public User(String password) {
-        setPassword(password);
+    public User(String masterPassword) {
+        setMasterPassword(masterPassword);
     }
 
     public User(File file) {
@@ -18,12 +18,12 @@ public class User {
 
     }
 
-    public String getPassword() {
-        return password;
+    public String getMasterPassword() {
+        return masterPassword;
     }
 
-    public void setPassword(String password) {
-        Objects.requireNonNull(password);
-        this.password = password;
+    public void setMasterPassword(String masterPassword) {
+        Objects.requireNonNull(masterPassword);
+        this.masterPassword = masterPassword;
     }
 }
