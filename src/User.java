@@ -18,6 +18,11 @@ public class User {
         try {
             Scanner scanner = new Scanner(file);
             masterPassword = scanner.nextLine();
+            int size = scanner.nextInt();
+            scanner.nextLine();
+            for(int i = 0; i < size; i++) {
+                accounts.add(new Account(scanner.nextLine()));
+            }
             scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -27,8 +32,11 @@ public class User {
     public void saveToFile(File file) {
         try {
             FileWriter writer = new FileWriter(file);
-            writer.write(masterPassword);
-            writer.write("\n");
+            writer.write(masterPassword + "\n");
+            writer.write(accounts.size() + "\n");
+            for(Account account : accounts) {
+                writer.write(account.toString() + "\n");
+            }
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

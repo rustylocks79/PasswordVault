@@ -113,7 +113,8 @@ public class Main {
                 System.out.println("\nThank you for using Password Vault v1");
             }
 
-            user.saveToFile(file);
+
         }
+        user.saveToFile(file);
     }
 }

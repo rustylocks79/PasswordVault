@@ -8,6 +8,14 @@ public class Account {
         this.password = password;
     }
 
+    public Account(String fileLine) {
+        String[] tokens = fileLine.split(",");
+        if(tokens.length != 3) { throw new IllegalArgumentException("File Line not properly formatted. "); }
+        id = tokens[0];
+        username = tokens[1];
+        password = tokens[2];
+    }
+
     public String getId() {
         return id;
     }
@@ -30,5 +38,10 @@ public class Account {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return id + "," + username + "," + password;
     }
 }
