@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Random;
@@ -29,8 +31,21 @@ public class Main {
         } else {
             user = new User("password");
         }
-        System.out.println(user.getMasterPassword().equals("password"));
 
+        boolean passwordloop = true;
+
+        while(passwordloop) {
+            System.out.print("Please enter passwword: ");
+            String checkpassword = scanner.nextLine();
+
+            if(checkpassword.equals(user.getMasterPassword())) {
+                System.out.println("\nPASSWORD VERIFIED\nUSER VERIFIED\nREMOVING SECURITY RESTRICTIONS");
+                passwordloop = false;
+            } else {
+                System.out.println("\nPassword incorrect, please try again\n");
+            }
+
+        }
 
         boolean menuLoop = true;
 
@@ -46,6 +61,9 @@ public class Main {
 
                 if (result2 == 0) {
 
+                    System.out.print("Please input new master password: ");
+                    String masterpassword = scanner.nextLine();
+                    user.setMasterPassword(masterpassword);
                 } else {
                     System.out.println("Very well, process cancelled");
                 }
@@ -66,7 +84,7 @@ public class Main {
 
             } else { //Exit
                 menuLoop = false;
-                System.out.println("Thank you for using Password Vault v1");
+                System.out.println("\nThank you for using Password Vault v1");
             }
 
             user.saveToFile(file);
