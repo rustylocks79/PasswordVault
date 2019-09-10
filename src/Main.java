@@ -1,6 +1,4 @@
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Random;
@@ -31,28 +29,12 @@ public class Main {
         } else {
             user = new User("password");
         }
-
-        boolean passwordloop = true;
-
-        while(passwordloop) {
-            System.out.print("Please enter passwword: ");
-            String checkpassword = scanner.nextLine();
-
-            if(checkpassword.equals(user.getMasterPassword())) {
-                System.out.println("\nPASSWORD VERIFIED\nUSER VERIFIED\nREMOVING SECURITY RESTRICTIONS");
-                passwordloop = false;
-            } else {
-                System.out.println("\nPassword incorrect, please try again\n");
-            }
-
-        }
+        System.out.println(user.getMasterPassword().equals("password"));
 
         boolean menuLoop = true;
-
         while(menuLoop) {
-
             System.out.println("\nPASSWORD VAULT v1 - MAIN MENU\n");
-            result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Retrieve Account", "Share Account", "Exit");
+            result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Share Account", "Exit");
 
             if (result == 0) { //Reset Master Password
 
@@ -61,9 +43,6 @@ public class Main {
 
                 if (result2 == 0) {
 
-                    System.out.print("Please input new master password: ");
-                    String masterpassword = scanner.nextLine();
-                    user.setMasterPassword(masterpassword);
                 } else {
                     System.out.println("Very well, process cancelled");
                 }
@@ -78,18 +57,13 @@ public class Main {
                 String newPassword = scanner.nextLine();
 
                 Account newAccount = new Account(newID, newUsername, newPassword);
-                user.getAccounts().add(newAccount);
 
-            } else if(result == 2) { //Retrieve Account
-
-
-
-            } else if (result == 3) { //Share Account
+            } else if (result == 2) { //Share Account
 
 
             } else { //Exit
                 menuLoop = false;
-                System.out.println("\nThank you for using Password Vault v1");
+                System.out.println("Thank you for using Password Vault v1");
             }
 
             user.saveToFile(file);
