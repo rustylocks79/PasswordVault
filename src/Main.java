@@ -35,7 +35,7 @@ public class Main {
         boolean passwordloop = true;
 
         while(passwordloop) {
-            System.out.print("Please enter passwword: ");
+            System.out.print("Please enter password: ");
             String checkpassword = scanner.nextLine();
 
             if(checkpassword.equals(user.getMasterPassword())) {
