@@ -26,7 +26,37 @@ public class Main {
         } else {
             user = new User("password");
         }
-        result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Share Account");
+        result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Share Account", "Exit");
+
+        if(result == 0) { //Reset Master Password
+
+            System.out.println("Are you sure? The process cannot be reversed");
+            int result2 = InputHelper.optionMenu("Yes","No");
+
+            if(result2 == 0) {
+
+            } else {
+                System.out.println("Very well, process cancelled");
+            }
+
+        } else if (result == 1) { //Add Account
+
+            System.out.print("Please enter account ID: ");
+            String newID = scanner.nextLine();
+            System.out.print("Please enter account Username: ");
+            String newUsername = scanner.nextLine();
+            System.out.print("Please enter account Password: ");
+            String newPassword = scanner.nextLine();
+
+            Account newAccount = new Account(newID, newUsername, newPassword);
+
+        } else if (result == 2){ //Share Account
+
+
+
+        } else { //Exit
+
+        }
 
         user.saveToFile(file);
     }
