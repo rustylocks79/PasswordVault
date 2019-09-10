@@ -28,6 +28,7 @@ public class User {
         try {
             FileWriter writer = new FileWriter(file);
             writer.write(masterPassword);
+            writer.write("\n");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

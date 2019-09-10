@@ -1,4 +1,6 @@
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -20,12 +22,15 @@ public class Main {
         int result = -1;
         Scanner scanner = new Scanner(System.in);
         User user = null;
-        File file = new File("rar.txt");
+        URL url = Main.class.getResource("save.txt");
+        File file = new File(url.getPath());
         if(file.exists()) {
             user = new User(file);
         } else {
             user = new User("password");
         }
+        System.out.println(user.getMasterPassword().equals("password"));
+
 
         boolean menuLoop = true;
 
