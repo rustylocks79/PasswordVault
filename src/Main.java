@@ -52,7 +52,7 @@ public class Main {
         while(menuLoop) {
 
             System.out.println("\nPASSWORD VAULT v1 - MAIN MENU\n");
-            result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Share Account", "Exit");
+            result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Retrieve Account", "Share Account", "Exit");
 
             if (result == 0) { //Reset Master Password
 
@@ -78,8 +78,13 @@ public class Main {
                 String newPassword = scanner.nextLine();
 
                 Account newAccount = new Account(newID, newUsername, newPassword);
+                user.getAccounts().add(newAccount);
 
-            } else if (result == 2) { //Share Account
+            } else if(result == 2) { //Retrieve Account
+
+
+
+            } else if (result == 3) { //Share Account
 
 
             } else { //Exit

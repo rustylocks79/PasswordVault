@@ -43,4 +43,8 @@ public class User {
         Objects.requireNonNull(masterPassword);
         this.masterPassword = masterPassword;
     }
+
+    public ArrayList<Account> getAccounts() {
+        return accounts;
+    }
 }
