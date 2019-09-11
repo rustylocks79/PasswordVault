@@ -74,8 +74,17 @@ public class Main {
                 String newID = scanner.nextLine();
                 System.out.print("Please enter account Username: ");
                 String newUsername = scanner.nextLine();
-                System.out.print("Please enter account Password: ");
-                String newPassword = scanner.nextLine();
+
+                int resultpass = InputHelper.optionMenu("Generate Random Password", "Input Custom Password");
+                String newPassword;
+
+                if(resultpass == 0) {
+                    newPassword = generateRandomPassword();
+                    System.out.println("Password generated: " + newPassword + "\n");
+                } else {
+                    System.out.print("Please enter account Password: ");
+                    newPassword = scanner.nextLine();
+                }
 
                 Account newAccount = new Account(newID, newUsername, newPassword);
                 user.getAccounts().add(newAccount);
@@ -106,7 +115,19 @@ public class Main {
                 System.out.print("Please enter the ID of the account you wish to share: ");
                 String shareID = scanner.nextLine();
 
+                Account targetAccount = null;
 
+                for(Account acc:user.getAccounts()) {
+                    if(acc.getId().equals(shareID)) {
+                        targetAccount = acc;
+                    }
+                }
+
+                if(targetAccount == null) {
+                    System.out.println("Sorry, that account does not exist, please try again later");
+                } else {
+                    targetAccount.writeToFile("share.txt");
+                }
 
             } else { //Exit
                 menuLoop = false;
