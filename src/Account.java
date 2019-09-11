@@ -1,3 +1,9 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
 public class Account {
 
     private String id,username,password;
@@ -14,6 +20,30 @@ public class Account {
         id = tokens[0];
         username = tokens[1];
         password = tokens[2];
+    }
+
+    public Account(File file) {
+        try {
+            Scanner scanner = new Scanner(file);
+            String[] tokens = scanner.nextLine().split(",");
+            if(tokens.length != 3) { throw new IllegalArgumentException("File not properly formatted. "); }
+            id = tokens[0];
+            username = tokens[1];
+            password = tokens[2];
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToFile(String filePath) {
+        try {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(toString() + "\n");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getId() {
