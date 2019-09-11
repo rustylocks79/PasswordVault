@@ -25,7 +25,9 @@ public class Account {
     public void writeToFile(String filePath) {
         try {
             FileWriter writer = new FileWriter(filePath);
-            writer.write(toString() + "\n");
+            writer.write("id: " + id + "\n");
+            writer.write("username: " + username + "\n");
+            writer.write("password: " + password + "\n");
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
