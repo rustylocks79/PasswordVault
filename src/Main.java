@@ -11,7 +11,7 @@ public class Main {
         int length = random.nextInt(MAX_PASSWORD_LENGTH) + MIN_PASSWORD_LENGTH;
         char[] chars = new char[length];
         for(int i = 0; i < length; i++) {
-            chars[i] = (char) (random.nextInt(89) + 33);
+            chars[i] = (char) (random.nextInt(78) + 48);
         }
         return new String(chars);
     }
