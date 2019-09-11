@@ -11,11 +11,20 @@ CMPSC 444
 
 3) What are potential adversaries?
 
-    answer...
+    Anyone to who you sent information. Anyone with your master password. Anyone who knows how to read a text file.
 
 4) What are the vulnerabilities for your vault, as it is currently designed and implemented?  (Limit to 1 page).
 
-    answer...
+    If a hacker has the master password then they have access to all the passwords and usernames that the user has
+    stored. Not only that but, the usernames and passwords have an id telling the hacker exactly where to use the
+    passwords. That means access to bank accounts, social media and more. Also, if the hacker had the master password,
+    they could change any of the user’s information which would compromise the integrity of the data. Next, the
+    text file storing the usernames, passwords and ids is not encrypted, it is in plain text. Anyone who gets access to
+    the text file would then know all the user’s information. Furthermore, when the user creates a text file with a
+    password, username and id to send somewhere, it is not encrypted. If the user sends the file by email, then the
+    recipient could share that file easily. Or the recipient’s email could be hacked, giving the hacker our user’s
+    information. Lastly, the user enters their password in plain text. Anyone watching their screen would then know
+    their password too. As you can see, confidentiality is a big problem with this password vault.
 
 5) How might the risk that you face change over time?  Specifically address the two components of risk.
 
