@@ -22,20 +22,6 @@ public class Account {
         password = tokens[2];
     }
 
-    public Account(File file) {
-        try {
-            Scanner scanner = new Scanner(file);
-            String[] tokens = scanner.nextLine().split(",");
-            if(tokens.length != 3) { throw new IllegalArgumentException("File not properly formatted. "); }
-            id = tokens[0];
-            username = tokens[1];
-            password = tokens[2];
-            scanner.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void writeToFile(String filePath) {
         try {
             FileWriter writer = new FileWriter(filePath);
