@@ -66,6 +66,8 @@ public class Main {
                     user.setMasterPassword(masterpassword);
                 } else {
                     System.out.println("Very well, process cancelled");
+                    System.out.print("Press enter to continue");
+                    String proceed = scanner.nextLine();
                 }
 
             } else if (result == 1) { //Add Account
@@ -90,6 +92,8 @@ public class Main {
                 user.getAccounts().add(newAccount);
 
                 System.out.println("Account added");
+                System.out.print("Press enter to continue");
+                String proceed = scanner.nextLine();
 
             } else if(result == 2) { //Retrieve Account
 
@@ -105,9 +109,13 @@ public class Main {
 
                 if(targetAccount == null) {
                     System.out.println("Sorry, that account does not exist, please try again later");
+                    System.out.print("Press enter to continue");
+                    String proceed = scanner.nextLine();
                 } else {
                     System.out.println("Account Username: " + targetAccount.getUsername());
                     System.out.println("Account Password: " + targetAccount.getPassword());
+                    System.out.print("Press enter to continue");
+                    String proceed = scanner.nextLine();
                 }
 
             } else if (result == 3) { //Share Account
@@ -125,8 +133,13 @@ public class Main {
 
                 if(targetAccount == null) {
                     System.out.println("Sorry, that account does not exist, please try again later");
+                    System.out.print("Press enter to continue");
+                    String proceed = scanner.nextLine();
                 } else {
                     targetAccount.writeToFile("share.txt");
+                    System.out.println("File created in local directory: share.txt");
+                    System.out.print("Press enter to continue");
+                    String proceed = scanner.nextLine();
                 }
 
             } else { //Exit
