@@ -29,9 +29,9 @@ public class User {
         }
     }
 
-    public void saveToFile(File file) {
+    public void saveToFile(String filePath) {
         try {
-            FileWriter writer = new FileWriter(file);
+            FileWriter writer = new FileWriter(filePath);
             writer.write(masterPassword + "\n");
             writer.write(accounts.size() + "\n");
             for(Account account : accounts) {

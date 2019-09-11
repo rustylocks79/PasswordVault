@@ -1,8 +1,4 @@
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -24,8 +20,7 @@ public class Main {
         int result = -1;
         Scanner scanner = new Scanner(System.in);
         User user = null;
-        URL url = Main.class.getResource("save.txt");
-        File file = new File(url.getPath());
+        File file = new File("save.txt");
         if(file.exists()) {
             user = new User(file);
         } else {
@@ -149,6 +144,6 @@ public class Main {
 
 
         }
-        user.saveToFile(file);
+        user.saveToFile("save.txt");
     }
 }
