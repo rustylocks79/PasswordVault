@@ -1,0 +1,12 @@
+Ben Warner, Emily Haigh, Jeremy Dellock
+CMPSC 444
+
+1) A description of how you are using symmetric key encryption,
+including how you are sharing the keys used in encrypting exported passwords.
+
+    We are using a single key/IV pair to encrypt all of our passwords in the plaintext file, when we want to
+    share an account we create an entirely new key/IV pair to encrypt the data and send with the file
+
+2) A revised list of vulnerabilities (1 page maximum).
+
+    answer...
