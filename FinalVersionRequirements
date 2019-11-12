@@ -1,0 +1,38 @@
+NOTE: The fourth requirement was clarified.  You are only allowed to store an unencrypted ID and ciphertext
+for each account entry in the vault.
+
+In this final assignment, you will attempt to fix the problems with the previous password vault programs.
+
+1) Give an appropriate message if the master password is entered incorrectly. You should store a value in a
+file to check this. However, the value stored in the file, should differ (with high probability) if two
+individuals select the same master password.  Note that the master password itself should not be stored
+either in an unencrypted format OR in an encrypted format.
+
+2) Ensure that the master password cannot be reset and allow access to the encrypted passwords.
+
+3) In order to mitigate the threat of session hijacking, prompt the user to enter the master password
+whenever they wish to:
+a) Enter a new ID/username/password combination
+b) Search for a new ID/username/password combination
+c) Share a password with a friend
+
+4) Use a single key to encrypt all usernames and passwords (other than the master password). These will be stored
+in a file that encrypts the usernames and passwords, but not the ID. Ensure that if two accounts have the same
+username and password, the encrypted text is different. Each entry should include just an unencrypted ID and ciphertext.
+
+5) Do not echo the characters in the master password to mitigate the threat of shoulder surfing.
+
+6) Ensure that sensitive information is stored securely, i.e. it exists for as short a time as possible in an
+unencrypted form either on disk or in memory.  To satisfy this requirement and requirement 5, you may wish to use
+the getPassword method from the Console class (Links to an external site.) (note that some IDE's do not support this,
+so you may need to test it at the command prompt.)  In addition, you may find that the Base64.Encoder
+(Links to an external site.)and Base64.Decoder (Links to an external site.) are helpful to meet these goals.
+
+7) Ensure that in the case of an error, you do not reveal sensitive information about the program in error messages.
+
+8) Use a cryptographically secure random number generator to generate a password that would be
+difficult to brute force.
+
+9) In order to share a password, you will prompt the user for the name of a certificate for the recipient.
+Use a local copy of CACert to verify the certificate, and hybrid encryption to encrypt the password for sending.
+You do not need to write the decryption program.

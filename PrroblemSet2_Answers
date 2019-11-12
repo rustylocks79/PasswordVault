@@ -9,4 +9,17 @@ including how you are sharing the keys used in encrypting exported passwords.
 
 2) A revised list of vulnerabilities (1 page maximum).
 
-    answer...
+    If a hacker has the master password then they have access to all the passwords and usernames that the user has
+    stored. Not only that but, the usernames and passwords have an id telling the hacker exactly where to use the
+    passwords. That means access to bank accounts, social media and more. Also, if the hacker had the master password,
+    they could change any of the user’s information which would compromise the integrity of the data.
+    Next, passwords are stored as strings in the program
+    so if someone dumped the memory, they could see the strings in plain text and could probably guess
+    which strings are passwords.
+    Next, we have no limit on the number of tries to enter the master password. A hacker could
+    try a brute force attack on the master password.
+    If our text file storing the data is changed, the user might not be able to access their information.
+    If an id is changed then they can't retrieve the password and username. Or, if the master password is
+    changed all hope is lost for the user.
+    Lastly, the user enters their password in plain text. Anyone watching their screen would then know
+    their password too. As you can see, confidentiality is a problem with this password vault.

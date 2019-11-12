@@ -1,5 +1,10 @@
+import javax.crypto.*;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class Account {
 
@@ -19,16 +24,30 @@ public class Account {
         password = tokens[2];
     }
 
-    public void writeToFile(String filePath) {
-        try {
-            FileWriter writer = new FileWriter(filePath);
-            writer.write("id: " + id + "\n");
-            writer.write("username: " + username + "\n");
-            writer.write("password: " + password + "\n");
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void saveToFile(String filePath) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
+        StringBuilder builder = new StringBuilder();
+        builder.append(id).append(",").append(username).append(",").append(password);
+        String plaintext = builder.toString();
+
+        // Create Key
+        KeyGenerator keygen = KeyGenerator.getInstance("AES");
+        SecretKey aesKey = keygen.generateKey();
+
+        // Encrypt Message
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+        byte[] secret = aesKey.getEncoded();
+        byte[] iv = cipher.getIV();
+        byte[] ciphertext = cipher.doFinal(plaintext.getBytes("UTF-8"));
+
+        //Write Message
+        FileWriter writer = new FileWriter(filePath);
+        writer.write(Base64.getEncoder().encodeToString(secret));
+        writer.write("\n");
+        writer.write(Base64.getEncoder().encodeToString(iv));
+        writer.write("\n");
+        writer.write(Base64.getEncoder().encodeToString(ciphertext));
+        writer.close();
     }
 
     public String getId() {
