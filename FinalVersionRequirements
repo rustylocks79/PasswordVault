@@ -5,7 +5,7 @@ In this final assignment, you will attempt to fix the problems with the previous
 
 1) Give an appropriate message if the master password is entered incorrectly. You should store a value in a
 file to check this. However, the value stored in the file, should differ (with high probability) if two
-individuals select the same master password.  Note that the master password itself should not be stored
+individuals select the same master password. Note that the master password itself should not be stored
 either in an unencrypted format OR in an encrypted format.
 
 2) Ensure that the master password cannot be reset and allow access to the encrypted passwords.

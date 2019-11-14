@@ -1,8 +1,7 @@
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,24 +12,25 @@ public class Main {
     private static int MAX_PASSWORD_LENGTH = 24;
     private static int MIN_PASSWORD_LENGTH = 12;
 
-    public static String generateRandomPassword() {
+    public static char[] generateRandomPassword() {
         SecureRandom random = new SecureRandom();
         int length = random.nextInt(MAX_PASSWORD_LENGTH) + MIN_PASSWORD_LENGTH;
         char[] chars = new char[length];
         for (int i = 0; i < length; i++) {
             chars[i] = (char) (random.nextInt(78) + 48);
         }
-        return new String(chars);
+        return chars;
     }
 
     public static boolean checkInput(String input) {
         boolean validated = false;
-        if (!input.contains(",") && !input.contains(";")) {
+        if (!input.contains(";")) {
             validated = true;
         }
         return validated;
     }
 
+    // TODO reset options menu
     public static void resetMasterPassword(User user, Scanner scanner) {
 
         System.out.println("Are you sure? The process cannot be reversed");
@@ -62,6 +62,7 @@ public class Main {
 
     }
 
+    // TODO add options menu
     public static void addAccount(User user, Scanner scanner) {
 
         String acctID = "";
@@ -100,9 +101,10 @@ public class Main {
         String newPassword;
 
         if (resultpass == 0) {
-            newPassword = generateRandomPassword();
-            System.out.println("Password generated: " + newPassword + "\n");
-            acctPass = newPassword;
+            // TODO refactor use of generated password
+            //newPassword = generateRandomPassword();
+            //System.out.println("Password generated: " + newPassword + "\n");
+            //acctPass = newPassword;
         } else {
             boolean passLoop = true;
             while (passLoop) {
@@ -128,6 +130,7 @@ public class Main {
 
     }
 
+    // TODO retrieve options menu
     public static void retrieveAccount(User user, Scanner scanner) {
 
         System.out.print("Please enter the ID of the account you wish to view: ");
@@ -153,6 +156,7 @@ public class Main {
 
     }
 
+    // TODO sharing options menu
     public static void shareAccount(User user, Scanner scanner) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 
         System.out.print("Please enter the ID of the account you wish to share: ");
@@ -179,7 +183,21 @@ public class Main {
 
     }
 
+    // TODO main loop
     public static void main(String[] args) throws NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, IOException, InvalidAlgorithmParameterException {
+
+        {   // This is an example of how to read a char array with buffered reader
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//
+//            char[] arr1 = new char[10];
+//
+//            System.out.println("Input up to 10 characters: ");
+//            reader.read(arr1, 0, 10);
+//
+//            System.out.println(arr1);
+        }
+
+        // TODO fix this main method stuff
         int result = -1;
         Scanner scanner = new Scanner(System.in);
         User user = null;
@@ -209,7 +227,7 @@ public class Main {
 
         while (menuLoop) {
 
-            System.out.println("\nPASSWORD VAULT v1 - MAIN MENU\n");
+            System.out.println("\nJEB'S PASSWORD VAULT - MAIN MENU\n");
             result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Retrieve Account", "Share Account", "Exit");
 
             switch (result) {
@@ -228,7 +246,7 @@ public class Main {
                     break;
                 case 4:
                     menuLoop = false;
-                    System.out.println("\nThank you for using Password Vault v1");
+                    System.out.println("\nThank you for using JEB's Password Vault");
                     break;
             }
 
