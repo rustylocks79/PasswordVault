@@ -11,21 +11,52 @@ import java.util.*;
 
 public class User {
     private Map<String, String> accounts = new HashMap<>();
-    private byte[] hashedMasterPassword;
+    private byte[] key, hashedMasterPassword;
 
-    public User(String filePath, byte[] hashedMasterPassword) throws FileNotFoundException {
-        this.hashedMasterPassword = hashedMasterPassword;
-        Scanner scanner = new Scanner(new FileInputStream(filePath));
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            int split = line.indexOf(';');
-            accounts.put(line.substring(0, split), line.substring(split + 1));
+    public User(char[] masterPassword) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(CharHelper.charsToBytes(masterPassword));
+            this.hashedMasterPassword = md.digest();
+
+            KeyGenerator keygen = KeyGenerator.getInstance("AES");
+            SecretKey aesKey = keygen.generateKey();
+            key = aesKey.getEncoded();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace(); //TODO: handle
         }
-        scanner.close();
+    }
+
+    public User(String filePath, char[] masterPassword) throws FileNotFoundException {
+        this(new File(filePath), masterPassword);
+    }
+
+    public User(File file, char[] masterPassword) throws FileNotFoundException {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(CharHelper.charsToBytes(masterPassword));
+            this.hashedMasterPassword = md.digest();
+
+            Scanner scanner = new Scanner(new FileInputStream(file));
+            this.key = readKeyFromFile(scanner, hashedMasterPassword);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                int split = line.indexOf(';');
+                accounts.put(line.substring(0, split), line.substring(split + 1));
+            }
+            scanner.close();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace(); //TODO: handle
+        }
     }
 
     public void saveToFile(String filePath) throws IOException {
-        FileWriter writer = new FileWriter(filePath);
+        this.saveToFile(new File(filePath));
+    }
+
+    public void saveToFile(File file) throws IOException {
+        FileWriter writer = new FileWriter(file);
+        writeKeyToFile(writer, key, hashedMasterPassword);
         for(String id : accounts.keySet()) {
             writer.write(id);
             writer.write(";");
@@ -33,6 +64,10 @@ public class User {
             writer.write("\n");
         }
         writer.close();
+    }
+
+    public void clean() {
+        //TODO: implement
     }
 
     public boolean hasAccount(String id) {
@@ -43,7 +78,10 @@ public class User {
         if(!hasAccount(id)) {
             throw new NoSuchElementException("No account with id: " + id);
         } else {
-            return new Account(decrypt(accounts.get(id), hashedMasterPassword, id));
+            char[] accountText = decrypt(accounts.get(id), key, id);
+            Account result = new Account(accountText);
+            Arrays.fill(accountText, (char) 0);
+            return result;
         }
     }
 
@@ -51,31 +89,56 @@ public class User {
         if(hasAccount(account.getId())) {
             throw new IllegalArgumentException("User already has an account with id: " + account.getId());
         }
-        accounts.put(account.getId(), encrypt(account.toCharArray(), hashedMasterPassword, account.getId()));
+        accounts.put(account.getId(), encrypt(account.toCharArray(), key, account.getId()));
     }
 
-    public void resetMastPassword(byte[] hashedMasterPassword) {
-        byte[] oldMasterPassword = this.hashedMasterPassword;
-        this.hashedMasterPassword = hashedMasterPassword;
-        for(String id : accounts.keySet()) {
-            accounts.put(id, encrypt(decrypt(accounts.get(id), oldMasterPassword, id), hashedMasterPassword, id));
+//    public void resetMastPassword(byte[] hashedMasterPassword) {
+//        byte[] oldMasterPassword = this.hashedMasterPassword;
+//        this.hashedMasterPassword = hashedMasterPassword;
+//        for(String id : accounts.keySet()) {
+//            accounts.put(id, encrypt(decrypt(accounts.get(id), oldMasterPassword, id), hashedMasterPassword, id));
+//        }
+//    }
+
+    private static void writeKeyToFile(FileWriter writer, byte[] key, byte[] hashedMasterPassword) throws IOException {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(hashedMasterPassword, "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+
+            byte[] cipherBytes = cipher.doFinal(key);
+            writer.write(Base64.getEncoder().encodeToString(cipherBytes));
+            Arrays.fill(cipherBytes, (byte) 0);
+
+            writer.write(";");
+
+            byte[] iv = cipher.getIV();
+            writer.write(Base64.getEncoder().encodeToString(iv));
+            Arrays.fill(iv, (byte) 0);
+
+            writer.write("\n");
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
         }
     }
 
-    private String encrypt(char[] plainText, byte[] masterPassword, String id) {
+    private static String encrypt(char[] plainText, byte[] key, String id) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(id.getBytes(StandardCharsets.UTF_8));
             byte[] iv = Arrays.copyOf(md.digest(), 16);
 
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(masterPassword, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec);
-//            byte[] plainBytes = new String(plainText).getBytes(StandardCharsets.UTF_8); //TODO: cheating
-            byte[] plainBytes = CharUtilities.charsToBytes(plainText);
+            byte[] plainBytes = CharHelper.charsToBytes(plainText);
             byte[] cipherBytes = cipher.doFinal(plainBytes);
+            Arrays.fill(plainBytes, (byte) 0);
             return Base64.getEncoder().encodeToString(cipherBytes);
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
             System.err.println("This program is improperly configured. ");
@@ -85,21 +148,41 @@ public class User {
         return null;
     }
 
-    private char[] decrypt(String cipherText, byte[] masterPassword, String id) {
+    private static byte[] readKeyFromFile(Scanner scanner, byte[] hashedMasterPassword) {
+        try {
+            String[] components = scanner.nextLine().split(";");
+            byte[] cipherBytes = Base64.getDecoder().decode(components[0]);
+            byte[] iv = Base64.getDecoder().decode(components[1]);
+
+            SecretKey key = new SecretKeySpec(hashedMasterPassword, "AES");
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+
+            return cipher.doFinal(cipherBytes);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static char[] decrypt(String cipherText, byte[] key, String id) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(id.getBytes(StandardCharsets.UTF_8));
             byte[] iv = Arrays.copyOf(md.digest(), 16);
 
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(masterPassword, "AES");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
             byte[] cipherBytes = Base64.getDecoder().decode(cipherText);
             byte[] plainBytes = cipher.doFinal(cipherBytes);
-//            return new String(plainBytes, StandardCharsets.UTF_8).toCharArray(); //TODO: cheating
-            return CharUtilities.bytesToChars(plainBytes);
+            char[] plainText =  CharHelper.bytesToChars(plainBytes);
+            Arrays.fill(plainBytes, (byte) 0);
+            return plainText;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
             System.err.println("This program is improperly configured. ");
             System.err.println("Please report this on https://chickenonaraft.com/");

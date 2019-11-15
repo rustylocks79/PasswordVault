@@ -1,4 +1,4 @@
-public class CharUtilities {
+public class CharHelper {
     public static int indexOf(char[] chars, char c, int start) {
         for (int i = start; i < chars.length; i++) {
             if(chars[i] == c) {

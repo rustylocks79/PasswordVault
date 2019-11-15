@@ -6,8 +6,8 @@ public class Account {
     private char[] username, password;
 
     public Account(char[] chars) {
-        int index0 = CharUtilities.indexOf(chars, ';');
-        int index1 = CharUtilities.indexOf(chars, ';', index0 + 1);
+        int index0 = CharHelper.indexOf(chars, ';');
+        int index1 = CharHelper.indexOf(chars, ';', index0 + 1);
         id = new String(Arrays.copyOfRange(chars, 0, index0));
         username = Arrays.copyOfRange(chars, index0 + 1, index1);
         password = Arrays.copyOfRange(chars, index1 + 1, chars.length);
