@@ -16,7 +16,13 @@ public class Tester {
         File file = new File("save.txt");
         User user = null;
         if(file.exists()) {
-            user = new User(file, "password".toCharArray());
+            Verifier verifier = new Verifier(file);
+            if(verifier.verify("password".toCharArray())) {
+                user = new User(file, "password".toCharArray());
+            } else {
+                System.out.println("Wrong");
+                System.exit(-1);
+            }
         } else {
             user = new User("password".toCharArray());
             Account inAccount0 = new Account("id", "username".toCharArray(), "password".toCharArray());
@@ -52,5 +58,6 @@ public class Tester {
         account2.clean();
 
         user.saveToFile("save.txt");
+        user.clean();
     }
 }

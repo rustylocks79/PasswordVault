@@ -12,6 +12,7 @@ import java.util.*;
 public class User {
     private Map<String, String> accounts = new HashMap<>();
     private byte[] key, hashedMasterPassword;
+    private String salt, saltedMasterPasswordHash;
 
     public User(char[] masterPassword) {
         try {
@@ -22,6 +23,9 @@ public class User {
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             SecretKey aesKey = keygen.generateKey();
             key = aesKey.getEncoded();
+
+            salt = "00000000000000000000";
+            saltedMasterPasswordHash = Verifier.getSaltedMasterPasswordHash(salt, masterPassword);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace(); //TODO: handle
         }
@@ -38,6 +42,9 @@ public class User {
             this.hashedMasterPassword = md.digest();
 
             Scanner scanner = new Scanner(new FileInputStream(file));
+            String headLine = scanner.nextLine();
+            salt = headLine.substring(0, Verifier.SALT_LENGTH);
+            saltedMasterPasswordHash = headLine.substring(Verifier.SALT_LENGTH);
             this.key = readKeyFromFile(scanner, hashedMasterPassword);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -56,6 +63,9 @@ public class User {
 
     public void saveToFile(File file) throws IOException {
         FileWriter writer = new FileWriter(file);
+        writer.write(salt);
+        writer.write(saltedMasterPasswordHash);
+        writer.write("\n");
         writeKeyToFile(writer, key, hashedMasterPassword);
         for(String id : accounts.keySet()) {
             writer.write(id);
@@ -92,13 +102,10 @@ public class User {
         accounts.put(account.getId(), encrypt(account.toCharArray(), key, account.getId()));
     }
 
-//    public void resetMastPassword(byte[] hashedMasterPassword) {
-//        byte[] oldMasterPassword = this.hashedMasterPassword;
-//        this.hashedMasterPassword = hashedMasterPassword;
-//        for(String id : accounts.keySet()) {
-//            accounts.put(id, encrypt(decrypt(accounts.get(id), oldMasterPassword, id), hashedMasterPassword, id));
-//        }
-//    }
+    public void resetMastPassword(byte[] hashedMasterPassword) {
+        this.hashedMasterPassword = hashedMasterPassword;
+
+    }
 
     private static void writeKeyToFile(FileWriter writer, byte[] key, byte[] hashedMasterPassword) throws IOException {
         try {
