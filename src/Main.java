@@ -106,6 +106,13 @@ public class Main {
 //        boolean idLoop = true;
 //        while (idLoop) {
 //            System.out.print("Please enter account ID: ");
+//        checking ids
+//        while(hasAccount(newID))
+//        {
+//            System.out.println("Please enter a different ID ");
+//            newID = scanner.nextLine();
+//        }
+
 //            String newID = scanner.nextLine();
 //            if (!checkInput(newID)) {
 //                System.out.println("Input cannot contain commas or semicolons, please try again");
