@@ -1,6 +1,0 @@
-Set a master password and change it
-master password should default to "password"
-store + retrieve usernames and passwords with an ID
-on new password creation, give option to use randomly generated password
-allow sharing password, create txt file with id,user,pass
-data should be persistent, saved to txt file
