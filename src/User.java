@@ -10,9 +10,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class User {
+    public static final int SALT_LENGTH = 20;
+
     private Map<String, String> accounts = new HashMap<>();
     private byte[] key, hashedMasterPassword;
-    private String salt, saltedMasterPasswordHash;
+    private String salt, saltedHashedMasterPassword;
 
     public User(char[] masterPassword) {
         try {
@@ -24,15 +26,13 @@ public class User {
             SecretKey aesKey = keygen.generateKey();
             key = aesKey.getEncoded();
 
-            salt = "00000000000000000000";
-            saltedMasterPasswordHash = Verifier.getSaltedMasterPasswordHash(salt, masterPassword);
+            salt = new String(CharHelper.generateSecureRandomString(20));
+            saltedHashedMasterPassword = getSaltedMasterPasswordHash(salt, masterPassword);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace(); //TODO: handle
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
         }
-    }
-
-    public User(String filePath, char[] masterPassword) throws FileNotFoundException {
-        this(new File(filePath), masterPassword);
     }
 
     public User(File file, char[] masterPassword) throws FileNotFoundException {
@@ -43,8 +43,8 @@ public class User {
 
             Scanner scanner = new Scanner(new FileInputStream(file));
             String headLine = scanner.nextLine();
-            salt = headLine.substring(0, Verifier.SALT_LENGTH);
-            saltedMasterPasswordHash = headLine.substring(Verifier.SALT_LENGTH);
+            salt = headLine.substring(0, SALT_LENGTH);
+            saltedHashedMasterPassword = headLine.substring(SALT_LENGTH);
             this.key = readKeyFromFile(scanner, hashedMasterPassword);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -53,18 +53,16 @@ public class User {
             }
             scanner.close();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace(); //TODO: handle
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
         }
-    }
-
-    public void saveToFile(String filePath) throws IOException {
-        this.saveToFile(new File(filePath));
     }
 
     public void saveToFile(File file) throws IOException {
         FileWriter writer = new FileWriter(file);
         writer.write(salt);
-        writer.write(saltedMasterPasswordHash);
+        writer.write(saltedHashedMasterPassword);
         writer.write("\n");
         writeKeyToFile(writer, key, hashedMasterPassword);
         for(String id : accounts.keySet()) {
@@ -77,7 +75,8 @@ public class User {
     }
 
     public void clean() {
-        //TODO: implement
+        Arrays.fill(key, (byte) 0);
+        Arrays.fill(hashedMasterPassword, (byte) 0);
     }
 
     public boolean hasAccount(String id) {
@@ -191,6 +190,24 @@ public class User {
             Arrays.fill(plainBytes, (byte) 0);
             return plainText;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
+        }
+        return null;
+    }
+
+    public static String getSaltedMasterPasswordHash(String salt, char[] masterPassword) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            char[] toEncrypt = new char[SALT_LENGTH + 256];
+            System.arraycopy(salt.toCharArray(), 0, toEncrypt, 0, salt.length());
+            System.arraycopy(masterPassword, 0, toEncrypt, salt.length(), masterPassword.length);
+            md.update(CharHelper.charsToBytes(toEncrypt));
+            String checkHash = Base64.getEncoder().encodeToString(md.digest());
+            Arrays.fill(toEncrypt, (char) 0);
+            return checkHash;
+        } catch (NoSuchAlgorithmException e) {
             System.err.println("This program is improperly configured. ");
             System.err.println("Please report this on https://chickenonaraft.com/");
             System.exit(-1);

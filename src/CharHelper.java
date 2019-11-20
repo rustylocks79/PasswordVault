@@ -1,4 +1,15 @@
+import java.security.SecureRandom;
+
 public class CharHelper {
+    public static char[] generateSecureRandomString(int length) {
+        SecureRandom random = new SecureRandom();
+        char[] chars = new char[length];
+        for (int i = 0; i < length; i++) {
+            chars[i] = (char) (random.nextInt(78) + 48);
+        }
+        return chars;
+    }
+
     public static int indexOf(char[] chars, char c, int start) {
         for (int i = start; i < chars.length; i++) {
             if(chars[i] == c) {

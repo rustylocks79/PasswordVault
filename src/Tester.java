@@ -57,7 +57,7 @@ public class Tester {
         account1.clean();
         account2.clean();
 
-        user.saveToFile("save.txt");
+        user.saveToFile(new File("save.txt"));
         user.clean();
     }
 }
