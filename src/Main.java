@@ -13,16 +13,6 @@ public class Main {
     private static int MAX_PASSWORD_LENGTH = 24;
     private static int MIN_PASSWORD_LENGTH = 12;
 
-    public static char[] generateRandomPassword() {
-        SecureRandom random = new SecureRandom();
-        int length = random.nextInt(MAX_PASSWORD_LENGTH) + MIN_PASSWORD_LENGTH;
-        char[] chars = new char[length];
-        for (int i = 0; i < length; i++) {
-            chars[i] = (char) (random.nextInt(78) + 48);
-        }
-        return chars;
-    }
-
     public static boolean checkInput(String input) {
         boolean validated = false;
         if (!input.contains(";")) {
@@ -38,27 +28,62 @@ public class Main {
         return true;
     }
 
-    public static boolean checkMasterPassword(User user) {
+    public static boolean checkMasterPassword(Verifier verifier,Console console) throws NoSuchAlgorithmException {
         boolean passwordloop = true;
-        Console console =  System.console();
-        boolean passwordverified = false;
 
         while (passwordloop) {
             System.out.print("Please enter password: ");
             char[] checkpassword = console.readPassword();
 
-            //TODO fix after password verification is added
-//            if (checkpassword.equals(user.getMasterPassword())) {
-//                System.out.println("\nPASSWORD VERIFIED\nUSER AUTHENTICATED\nREMOVING SECURITY RESTRICTIONS");
-//                Arrays.fill(checkpassword, '0');
-//                passwordverified = true;
-//                passwordloop = false;
-//            } else {
-//                System.out.println("\nPassword incorrect, please try again\n");
-//            }
+            if (verifier.verify(checkpassword)) {
+                System.out.println("\nPASSWORD VERIFIED\nUSER AUTHENTICATED\nREMOVING SECURITY RESTRICTIONS");
+                Arrays.fill(checkpassword, '0');
+                return true;
+            } else {
+                System.out.println("\nPassword incorrect, please try again\n");
+            }
 
         }
-        return passwordverified;
+        return false;
+    }
+
+    public static boolean checkMasterPassword(char[] password, Verifier verifier) throws NoSuchAlgorithmException {
+        return (verifier.verify(password));
+    }
+
+    //for created accounts
+    public static char[] getMasterPassword(Verifier verifier, Console console) throws NoSuchAlgorithmException {
+        char[] password = null;
+        boolean loopValue = true;
+
+        while(loopValue) {
+            System.out.print("Please enter password: ");
+            if (System.console() != null) {
+                password = console.readPassword(); //TODO fix this, scanner is a temporary thing to let program compile
+            } else {
+                Scanner scanner = new Scanner(System.in);
+                password = scanner.nextLine().toCharArray();
+            }
+
+            if(checkMasterPassword(password,verifier)) {
+                loopValue = false;
+                System.out.println("\nPASSWORD VERIFIED\nUSER AUTHENTICATED\nREMOVING SECURITY RESTRICTIONS");
+            } else {
+                System.out.println("\nPassword incorrect, please try again\n");
+            }
+        }
+        return password;
+    }
+
+    //for new accounts
+    public static char[] createMasterPassword() {
+        char[] password = null;
+
+        System.out.println("Welcome! Please enter your master password for the program: ");
+        Scanner scanner = new Scanner(System.in);
+        password = scanner.nextLine().toCharArray();
+
+        return password;
     }
 
     // TODO reset options menu
@@ -106,7 +131,7 @@ public class Main {
 //        boolean idLoop = true;
 //        while (idLoop) {
 //            System.out.print("Please enter account ID: ");
-//        checking ids
+//        //checking ids
 //        while(hasAccount(newID))
 //        {
 //            System.out.println("Please enter a different ID ");
@@ -225,6 +250,7 @@ public class Main {
     }
 
     // TODO main loop
+    //TODO error codes
     public static void main(String[] args) throws NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, IOException, InvalidAlgorithmParameterException {
 
         {   // This is an example of how to read a char array with buffered reader
@@ -241,13 +267,29 @@ public class Main {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         // TODO creating a user and retrieving file
+        Verifier verifier = null;
         User user = null;
-//        File file = new File("save.txt");
-//        if (file.exists()) {
-//            user = new User(file);
-//        } else {
-//            user = new User("password");
-//        }
+        File file = new File("save.txt");
+        char[] masPass = null;
+        Console console =  System.console();
+
+        //getting or creating user
+        {
+            if (file.exists()) {
+                verifier = new Verifier(file);
+                masPass = getMasterPassword(verifier, console);
+                if(checkMasterPassword(masPass,verifier)) {
+                    user = new User(file, masPass);
+                } else {
+                    System.out.println("Error has occurred, exiting program");
+                    System.exit(-1);
+                }
+            } else {
+                //masPass = getMasterPassword(verifier, console);
+                masPass = createMasterPassword();
+                user = new User(masPass);
+            }
+        }
 
         boolean menuLoop = true;
         while (menuLoop) {
@@ -259,19 +301,19 @@ public class Main {
             switch (result) {
 
                 case 0:
-                    if(!checkMasterPassword(user)) {break;}
+                    if(!checkMasterPassword(verifier,console)) {break;}
                     resetMasterPassword(user, reader);
                     break;
                 case 1:
-                    if(!checkMasterPassword(user)) {break;}
+                    if(!checkMasterPassword(verifier,console)) {break;}
                     addAccount(user, reader);
                     break;
                 case 2:
-                    if(!checkMasterPassword(user)) {break;}
+                    if(!checkMasterPassword(verifier,console)) {break;}
                     retrieveAccount(user, reader);
                     break;
                 case 3:
-                    if(!checkMasterPassword(user)) {break;}
+                    if(!checkMasterPassword(verifier,console)) {break;}
                     shareAccount(user, reader);
                     break;
                 case 4:
@@ -281,6 +323,6 @@ public class Main {
             }
 
         }
-        user.saveToFile("save.txt");
+        user.saveToFile(new File("save.txt"));
     }
 }
