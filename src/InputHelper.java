@@ -1,11 +1,11 @@
+import java.io.Console;
 import java.util.Scanner;
 
 public class InputHelper {
-    private static final Scanner scanner = new Scanner(System.in);
-
     public static int optionMenu(String... options) {
         int result;
         boolean condition;
+        Scanner scanner = new Scanner(System.in);
         do {
             for(int i = 0; i < options.length; i++) {
                 System.out.println((i + 1) + ") " + options[i]);
@@ -21,11 +21,17 @@ public class InputHelper {
     }
 
     public static char[] getValidInput(String prompt) {
+        Console console = System.console();
+        Scanner scanner = new Scanner(System.in);
         char[] result;
         boolean condition;
         do {
             System.out.print(prompt);
-            result = scanner.nextLine().toCharArray(); //TODO: replace
+            if (System.console() != null) {
+                result = console.readPassword();
+            } else {
+                result = scanner.nextLine().toCharArray();
+            }
             condition = CharHelper.contains(result, ';');
             if(condition) {
                 System.out.println("Input can't contain a ';'. ");
