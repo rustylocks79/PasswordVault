@@ -176,7 +176,9 @@ public class User {
 
             return cipher.doFinal(cipherBytes);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            e.printStackTrace();
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
         }
         return null;
     }

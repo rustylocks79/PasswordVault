@@ -21,7 +21,7 @@ public class Main {
         for(int i=0; i<3; i++) {
             System.out.print("Please enter password: ");
             if (System.console() != null) {
-                password = console.readPassword(); //TODO fix this, scanner is a temporary thing to let program compile
+                password = console.readPassword();
             } else {
                 Scanner scanner = new Scanner(System.in);
                 password = scanner.nextLine().toCharArray();
@@ -38,12 +38,16 @@ public class Main {
     }
 
     //for new accounts
-    public static char[] createMasterPassword() {
+    public static char[] createMasterPassword(Console console) {
         char[] password = null;
 
-        System.out.println("Welcome! Please enter your master password for the program: ");
-        Scanner scanner = new Scanner(System.in);
-        password = scanner.nextLine().toCharArray();
+        System.out.print("Welcome! Please enter your master password for the program: ");
+        if (System.console() != null) {
+            password = console.readPassword();
+        } else {
+            Scanner scanner = new Scanner(System.in);
+            password = scanner.nextLine().toCharArray();
+        }
 
         return password;
     }
@@ -62,7 +66,7 @@ public class Main {
                 System.out.print("Please input new master password: ");
                 char[] masterpassword = null;
                 if (System.console() != null) {
-                    masterpassword = console.readPassword(); //TODO fix this, scanner is a temporary thing to let program compile
+                    masterpassword = console.readPassword();
                 } else {
                     Scanner scanner = new Scanner(System.in);
                     masterpassword = scanner.nextLine().toCharArray();
@@ -87,7 +91,6 @@ public class Main {
         String targetID = reader.readLine();
 
         if(!user.hasAccount(targetID)) {
-            //TODO inputhelper must use console
             char[] username = InputHelper.getValidInput("Please enter account username: ");
 
             int resultpass = InputHelper.optionMenu("Generate Random Password", "Input Custom Password");
@@ -181,7 +184,7 @@ public class Main {
                     System.exit(-1);
                 }
             } else {
-                masPass = createMasterPassword();
+                masPass = createMasterPassword(console);
                 user = new User(masPass);
                 Arrays.fill(masPass,'0');
                 verifier = new Verifier(user);
