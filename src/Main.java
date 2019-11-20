@@ -6,12 +6,13 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    private static int MAX_PASSWORD_LENGTH = 24;
-    private static int MIN_PASSWORD_LENGTH = 12;
+    private static final int MAX_PASSWORD_LENGTH = 24;
+    private static final int MIN_PASSWORD_LENGTH = 12;
 
     //for created accounts
     public static char[] getMasterPassword(Verifier verifier, Console console) throws NoSuchAlgorithmException {
@@ -79,7 +80,6 @@ public class Main {
 
     }
 
-    // TODO add options menu
     public static void addAccount(User user, BufferedReader reader) throws IOException {
 
 
@@ -133,47 +133,32 @@ public class Main {
 
     }
 
-    // TODO sharing options menu
-    public static void shareAccount(User user, BufferedReader reader) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    public static void shareAccount(User user, BufferedReader reader) throws IOException {
 
-//        System.out.print("Please enter the ID of the account you wish to share: ");
-//        String shareID = scanner.nextLine();
-//
-//        Account targetAccount = null;
-//
-//        for (Account acc : user.getAccounts()) {
-//            if (acc.getId().equals(shareID)) {
-//                targetAccount = acc;
-//            }
-//        }
-//
-//        if (targetAccount == null) {
-//            System.out.println("Sorry, that account does not exist, please try again later");
-//            System.out.print("Press enter to continue");
-//            String proceed = scanner.nextLine();
-//        } else {
-//            targetAccount.saveToFile("share.txt");
-//            System.out.println("File created in local directory: share.txt");
-//            System.out.print("Press enter to continue");
-//            String proceed = scanner.nextLine();
-//        }
+        System.out.print("Please enter the ID of the account you wish to share: ");
+        String shareID = reader.readLine();
 
+        if(user.hasAccount(shareID)) {
+            Account targetAccount = user.getAccount(shareID);
+            System.out.print("Please enter the file path for the receiver's certificate: ");
+            String recCert = reader.readLine();
+            try {
+                Networker.share(recCert, "share.txt", targetAccount);
+            } catch (CertificateException e) {
+                System.err.println("Receiver certificate not valid");
+            } catch (IOException e) {
+                System.err.println("File could not be found");
+                System.err.println(recCert);
+            }
+            targetAccount.clean();
+        } else {
+            System.out.println("Sorry, that account does not exist, please try again later");
+            System.out.print("Press enter to continue");
+            String proceed = reader.readLine();
+        }
     }
 
-    // TODO main loop
-    //TODO error codes
     public static void main(String[] args) throws NoSuchPaddingException, BadPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, IOException, InvalidAlgorithmParameterException {
-
-        {   // This is an example of how to read a char array with buffered reader
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-//
-//            char[] arr1 = new char[10];
-//
-//            System.out.println("Input up to 10 characters: ");
-//            reader.read(arr1, 0, 10); //arr1 => target array, 0 => starting index, 10 => max characters
-//
-//            System.out.println(arr1);
-        }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 

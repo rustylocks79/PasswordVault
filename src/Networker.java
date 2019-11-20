@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 public class Networker {
-    private Certificate createValidCertificate(String certFilePath) throws FileNotFoundException, CertificateException {
+    private static Certificate createValidCertificate(String certFilePath) throws FileNotFoundException, CertificateException {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             Certificate receiverCertificate = cf.generateCertificate(new FileInputStream(certFilePath));
@@ -31,14 +31,14 @@ public class Networker {
         return null;
     }
 
-    public void share(String certFilePath, String resultPath, Account account) throws IOException, CertificateException {
+    public static void share(String certFilePath, String resultPath, Account account) throws IOException, CertificateException {
         try {
             Certificate cert = createValidCertificate(certFilePath);
             Cipher rsaCipher = Cipher.getInstance("RSA");
             rsaCipher.init(Cipher.WRAP_MODE, cert);
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             SecretKey aesKey = keygen.generateKey();
-            String wrappedKey = Base64.getEncoder().encodeToString(rsaCipher.doFinal(aesKey.getEncoded()));
+            String wrappedKey = Base64.getEncoder().encodeToString(rsaCipher.wrap(aesKey));
             Cipher aesCipher = Cipher.getInstance("AES");
             aesCipher.init(Cipher.ENCRYPT_MODE, aesKey);
             char[] plainChars = account.toCharArray();
@@ -50,6 +50,7 @@ public class Networker {
             writer.write(wrappedKey);
             writer.write(";");
             writer.write(cipherText);
+            writer.close();
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidKeyException e) {
             System.err.println("This program is improperly configured. ");
             System.err.println("Please report this on https://chickenonaraft.com/");
