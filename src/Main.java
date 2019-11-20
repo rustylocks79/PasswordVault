@@ -28,35 +28,11 @@ public class Main {
         return true;
     }
 
-    public static boolean checkMasterPassword(Verifier verifier,Console console) throws NoSuchAlgorithmException {
-        boolean passwordloop = true;
-
-        while (passwordloop) {
-            System.out.print("Please enter password: ");
-            char[] checkpassword = console.readPassword();
-
-            if (verifier.verify(checkpassword)) {
-                System.out.println("\nPASSWORD VERIFIED\nUSER AUTHENTICATED\nREMOVING SECURITY RESTRICTIONS");
-                Arrays.fill(checkpassword, '0');
-                return true;
-            } else {
-                System.out.println("\nPassword incorrect, please try again\n");
-            }
-
-        }
-        return false;
-    }
-
-    public static boolean checkMasterPassword(char[] password, Verifier verifier) throws NoSuchAlgorithmException {
-        return (verifier.verify(password));
-    }
-
     //for created accounts
     public static char[] getMasterPassword(Verifier verifier, Console console) throws NoSuchAlgorithmException {
         char[] password = null;
-        boolean loopValue = true;
 
-        while(loopValue) {
+        for(int i=0; i<3; i++) {
             System.out.print("Please enter password: ");
             if (System.console() != null) {
                 password = console.readPassword(); //TODO fix this, scanner is a temporary thing to let program compile
@@ -65,14 +41,14 @@ public class Main {
                 password = scanner.nextLine().toCharArray();
             }
 
-            if(checkMasterPassword(password,verifier)) {
-                loopValue = false;
+            if(verifier.verify(password)) {
                 System.out.println("\nPASSWORD VERIFIED\nUSER AUTHENTICATED\nREMOVING SECURITY RESTRICTIONS");
+                return password;
             } else {
                 System.out.println("\nPassword incorrect, please try again\n");
             }
         }
-        return password;
+        return null;
     }
 
     //for new accounts
@@ -278,16 +254,16 @@ public class Main {
             if (file.exists()) {
                 verifier = new Verifier(file);
                 masPass = getMasterPassword(verifier, console);
-                if(checkMasterPassword(masPass,verifier)) {
+                if(masPass != null) {
                     user = new User(file, masPass);
                 } else {
-                    System.out.println("Error has occurred, exiting program");
+                    System.err.println("Incorrect Password, exiting program");
                     System.exit(-1);
                 }
             } else {
-                //masPass = getMasterPassword(verifier, console);
                 masPass = createMasterPassword();
                 user = new User(masPass);
+                verifier = new Verifier(user);
             }
         }
 
@@ -297,23 +273,37 @@ public class Main {
             int result = -1;
             System.out.println("\nJEB'S PASSWORD VAULT - MAIN MENU\n");
             result = InputHelper.optionMenu("Reset Master Password", "Add Account", "Retrieve Account", "Share Account", "Exit");
-
             switch (result) {
-
                 case 0:
-                    if(!checkMasterPassword(verifier,console)) {break;}
+                    if(getMasterPassword(verifier,console) == null)
+                    {
+                        System.err.println("Incorrect password, exiting program");
+                        System.exit(-1);
+                    }
                     resetMasterPassword(user, reader);
                     break;
                 case 1:
-                    if(!checkMasterPassword(verifier,console)) {break;}
+                    if(getMasterPassword(verifier,console) == null)
+                    {
+                        System.err.println("Incorrect password, exiting program");
+                        System.exit(-1);
+                    }
                     addAccount(user, reader);
                     break;
                 case 2:
-                    if(!checkMasterPassword(verifier,console)) {break;}
+                    if(getMasterPassword(verifier,console) == null)
+                    {
+                        System.err.println("Incorrect password, exiting program");
+                        System.exit(-1);
+                    }
                     retrieveAccount(user, reader);
                     break;
                 case 3:
-                    if(!checkMasterPassword(verifier,console)) {break;}
+                    if(getMasterPassword(verifier,console) == null)
+                    {
+                        System.err.println("Incorrect password, exiting program");
+                        System.exit(-1);
+                    }
                     shareAccount(user, reader);
                     break;
                 case 4:
