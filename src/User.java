@@ -214,4 +214,12 @@ public class User {
         }
         return null;
     }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public String getSaltedHashedMasterPassword() {
+        return saltedHashedMasterPassword;
+    }
 }

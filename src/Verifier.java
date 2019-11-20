@@ -14,6 +14,11 @@ public class Verifier {
         hash = line.substring(User.SALT_LENGTH);
     }
 
+    public Verifier(User user) {
+        salt = user.getSalt();
+        hash = user.getSaltedHashedMasterPassword();
+    }
+
     public boolean verify(char[] masterPassword) {
         String checkHash = User.getSaltedMasterPasswordHash(salt, masterPassword);
         return checkHash.equals(hash);

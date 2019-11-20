@@ -13,6 +13,13 @@ public class Tester {
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+        {
+            Verifier verifier = new Verifier(new File("save.txt"));
+            //boolean res = verifier.isValidCertificate("C:\\CompSci\\School\\CMPSC_444\\PasswordVault\\receiverCertificate.crt");
+            //System.out.println(res);
+        }
+
+
         File file = new File("save.txt");
         User user = null;
         if(file.exists()) {
