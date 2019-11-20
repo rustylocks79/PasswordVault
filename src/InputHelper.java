@@ -35,6 +35,8 @@ public class InputHelper {
             condition = CharHelper.contains(result, ';');
             if(condition) {
                 System.out.println("Input can't contain a ';'. ");
+                System.out.print("Press enter to continue");
+                scanner.nextLine();
             }
         } while (condition);
         return result;

@@ -5,6 +5,7 @@ import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -79,78 +80,35 @@ public class Main {
     }
 
     // TODO add options menu
-    public static void addAccount(User user, BufferedReader reader) {
+    public static void addAccount(User user, BufferedReader reader) throws IOException {
 
-//        String acctID = "";
-//        String acctUser = "";
-//        String acctPass = "";
-//
-//        boolean idLoop = true;
-//        while (idLoop) {
-//            System.out.print("Please enter account ID: ");
-//        //checking ids
-//        while(hasAccount(newID))
-//        {
-//            System.out.println("Please enter a different ID ");
-//            newID = scanner.nextLine();
-//        }
 
-//            String newID = scanner.nextLine();
-//            if (!checkInput(newID)) {
-//                System.out.println("Input cannot contain commas or semicolons, please try again");
-//                System.out.print("Press enter to continue");
-//                scanner.nextLine();
-//            } else {
-//                idLoop = false;
-//                acctID = newID;
-//            }
-//        }
-//
-//        boolean userLoop = true;
-//        while (userLoop) {
-//            System.out.print("Please enter account Username: ");
-//            String newUsername = scanner.nextLine();
-//            if (!checkInput(newUsername)) {
-//                System.out.println("Input cannot contain commas or semicolons, please try again");
-//                System.out.print("Press enter to continue");
-//                scanner.nextLine();
-//            } else {
-//                userLoop = false;
-//                acctUser = newUsername;
-//            }
-//        }
-//
-//        int resultpass = InputHelper.optionMenu("Generate Random Password", "Input Custom Password");
-//        String newPassword;
-//
-//        if (resultpass == 0) {
-//            // TODO refactor use of generated password
-//            //newPassword = generateRandomPassword();
-//            //System.out.println("Password generated: " + newPassword + "\n");
-//            //acctPass = newPassword;
-//        } else {
-//            boolean passLoop = true;
-//            while (passLoop) {
-//                System.out.print("Please enter account Password: ");
-//                newPassword = scanner.nextLine();
-//                if (!checkInput(newPassword)) {
-//                    System.out.println("Input cannot contain commas or semicolons, please try again");
-//                    System.out.print("Press enter to continue");
-//                    scanner.nextLine();
-//                } else {
-//                    passLoop = false;
-//                    acctPass = newPassword;
-//                }
-//            }
-//        }
-//
-//        Account newAccount = new Account(acctID, acctUser, acctPass);
-//        user.getAccounts().add(newAccount);
-//
-//        System.out.println("Account added");
-//        System.out.print("Press enter to continue");
-//        String proceed = scanner.nextLine();
+        System.out.print("Please enter the ID of the account you wish to add: ");
+        String targetID = reader.readLine();
 
+        if(!user.hasAccount(targetID)) {
+            //TODO inputhelper must use console
+            char[] username = InputHelper.getValidInput("Please enter account username: ");
+
+            int resultpass = InputHelper.optionMenu("Generate Random Password", "Input Custom Password");
+            char[] password = null;
+
+            if (resultpass == 0) {
+                SecureRandom secureRandom = new SecureRandom();
+                int length = secureRandom.nextInt(MAX_PASSWORD_LENGTH-MIN_PASSWORD_LENGTH) + MIN_PASSWORD_LENGTH;
+                password = CharHelper.generateSecureRandomString(length);
+            } else {
+                password = InputHelper.getValidInput("Please enter account password: ");
+            }
+
+            Account acc = new Account(targetID,username,password);
+            user.addAccount(acc);
+            acc.clean();
+        } else {
+            System.out.println("Sorry, that account already exists, please try again later");
+            System.out.print("Press enter to continue");
+            String proceed = reader.readLine();
+        }
     }
 
     public static void retrieveAccount(User user, BufferedReader reader) throws IOException {
@@ -244,7 +202,6 @@ public class Main {
                 verifier = new Verifier(user);
             }
         }
-
 
         boolean menuLoop = true;
         while (menuLoop) {
