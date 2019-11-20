@@ -24,7 +24,7 @@ public class InputHelper {
         char[] result;
         boolean condition;
         do {
-            System.out.println(prompt);
+            System.out.print(prompt);
             result = scanner.nextLine().toCharArray(); //TODO: replace
             condition = CharHelper.contains(result, ';');
             if(condition) {

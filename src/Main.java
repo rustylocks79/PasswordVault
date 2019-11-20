@@ -5,28 +5,12 @@ import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
     private static int MAX_PASSWORD_LENGTH = 24;
     private static int MIN_PASSWORD_LENGTH = 12;
-
-    public static boolean checkInput(String input) {
-        boolean validated = false;
-        if (!input.contains(";")) {
-            validated = true;
-        }
-        return validated;
-    }
-
-    public static boolean checkInput(char[] input) {
-        for(char c:input) {
-            if(c == ';') return false;
-        }
-        return true;
-    }
 
     //for created accounts
     public static char[] getMasterPassword(Verifier verifier, Console console) throws NoSuchAlgorithmException {
@@ -62,7 +46,6 @@ public class Main {
         return password;
     }
 
-    // TODO reset options menu
     public static void resetMasterPassword(User user, BufferedReader reader) throws IOException {
 
         System.out.println("Are you sure? The process cannot be reverted");
@@ -75,18 +58,16 @@ public class Main {
 
             while (methodloop) {
                 System.out.print("Please input new master password: ");
-                char[] masterpassword = console.readPassword();
-
-                if (checkInput(masterpassword)) {
-                    //TODO fix after reset function added
-                    //user.resetMastPassword(masterpassword);
+                char[] masterpassword = null;
+                if (System.console() != null) {
+                    masterpassword = console.readPassword(); //TODO fix this, scanner is a temporary thing to let program compile
+                } else {
+                    Scanner scanner = new Scanner(System.in);
+                    masterpassword = scanner.nextLine().toCharArray();
+                }
+                    user.resetMastPassword(masterpassword);
                     Arrays.fill(masterpassword,'0');
                     methodloop = false;
-                } else {
-                    System.out.println("Input cannot contain commas or semicolons, please try again");
-                    System.out.print("Press enter to continue");
-                    reader.readLine();
-                }
             }
 
         } else {
@@ -172,29 +153,25 @@ public class Main {
 
     }
 
-    // TODO retrieve options menu
-    public static void retrieveAccount(User user, BufferedReader reader) {
+    public static void retrieveAccount(User user, BufferedReader reader) throws IOException {
 
-//        System.out.print("Please enter the ID of the account you wish to view: ");
-//        String retrieveID = scanner.nextLine();
-//        Account targetAccount = null;
-//
-//        for (Account acc : user.getAccounts()) {
-//            if (acc.getId().equals(retrieveID)) {
-//                targetAccount = acc;
-//            }
-//        }
-//
-//        if (targetAccount == null) {
-//            System.out.println("Sorry, that account does not exist, please try again later");
-//            System.out.print("Press enter to continue");
-//            String proceed = scanner.nextLine();
-//        } else {
-//            System.out.println("Account Username: " + targetAccount.getUsername());
-//            System.out.println("Account Password: " + targetAccount.getPassword());
-//            System.out.print("Press enter to continue");
-//            String proceed = scanner.nextLine();
-//        }
+        System.out.print("Please enter the ID of the account you wish to view: ");
+        String retrieveID = reader.readLine();
+
+        if(user.hasAccount(retrieveID)) {
+            Account targetAccount = user.getAccount(retrieveID);
+            System.out.print("Account Username: ");
+            System.out.println(targetAccount.getUsername());
+            System.out.print("Account Password: ");
+            System.out.println(targetAccount.getPassword());
+            System.out.print("Press enter to continue");
+            String proceed = reader.readLine();
+            targetAccount.clean();
+        } else {
+            System.out.println("Sorry, that account does not exist, please try again later");
+            System.out.print("Press enter to continue");
+            String proceed = reader.readLine();
+        }
 
     }
 
@@ -242,7 +219,6 @@ public class Main {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        // TODO creating a user and retrieving file
         Verifier verifier = null;
         User user = null;
         File file = new File("save.txt");
@@ -256,6 +232,7 @@ public class Main {
                 masPass = getMasterPassword(verifier, console);
                 if(masPass != null) {
                     user = new User(file, masPass);
+                    Arrays.fill(masPass,'0');
                 } else {
                     System.err.println("Incorrect Password, exiting program");
                     System.exit(-1);
@@ -263,9 +240,11 @@ public class Main {
             } else {
                 masPass = createMasterPassword();
                 user = new User(masPass);
+                Arrays.fill(masPass,'0');
                 verifier = new Verifier(user);
             }
         }
+
 
         boolean menuLoop = true;
         while (menuLoop) {
@@ -281,6 +260,7 @@ public class Main {
                         System.exit(-1);
                     }
                     resetMasterPassword(user, reader);
+                    verifier = new Verifier(user);
                     break;
                 case 1:
                     if(getMasterPassword(verifier,console) == null)
