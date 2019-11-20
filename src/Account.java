@@ -21,7 +21,7 @@ public class Account {
 
     public void clean() {
         Arrays.fill(username, (char) 0);
-        Arrays.fill(password, (char) 1);
+        Arrays.fill(password, (char) 0);
     }
 
     public char[] toCharArray() {

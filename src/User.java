@@ -27,7 +27,7 @@ public class User {
             key = aesKey.getEncoded();
 
             salt = new String(CharHelper.generateSecureRandomString(20));
-            saltedHashedMasterPassword = getSaltedMasterPasswordHash(salt, masterPassword);
+            saltedHashedMasterPassword = hashSaltedMasterPassword(salt, masterPassword);
         } catch (NoSuchAlgorithmException e) {
             System.err.println("This program is improperly configured. ");
             System.err.println("Please report this on https://chickenonaraft.com/");
@@ -101,9 +101,17 @@ public class User {
         accounts.put(account.getId(), encrypt(account.toCharArray(), key, account.getId()));
     }
 
-    public void resetMastPassword(byte[] hashedMasterPassword) {
-        this.hashedMasterPassword = hashedMasterPassword;
-
+    public void resetMastPassword(char[] masterPassword) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(CharHelper.charsToBytes(masterPassword));
+            this.hashedMasterPassword = md.digest();
+            this.saltedHashedMasterPassword = hashSaltedMasterPassword(salt, masterPassword);
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("This program is improperly configured. ");
+            System.err.println("Please report this on https://chickenonaraft.com/");
+            System.exit(-1);
+        }
     }
 
     private static void writeKeyToFile(FileWriter writer, byte[] key, byte[] hashedMasterPassword) throws IOException {
@@ -197,7 +205,7 @@ public class User {
         return null;
     }
 
-    public static String getSaltedMasterPasswordHash(String salt, char[] masterPassword) {
+    public static String hashSaltedMasterPassword(String salt, char[] masterPassword) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             char[] toEncrypt = new char[SALT_LENGTH + 256];

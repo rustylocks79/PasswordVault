@@ -1,6 +1,8 @@
 import javax.crypto.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -8,6 +10,7 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class Networker {
@@ -28,7 +31,7 @@ public class Networker {
         return null;
     }
 
-    public void share(String certFilePath, String resultPath, Account account) throws FileNotFoundException, CertificateException {
+    public void share(String certFilePath, String resultPath, Account account) throws IOException, CertificateException {
         try {
             Certificate cert = createValidCertificate(certFilePath);
             Cipher rsaCipher = Cipher.getInstance("RSA");
@@ -39,7 +42,14 @@ public class Networker {
             Cipher aesCipher = Cipher.getInstance("AES");
             aesCipher.init(Cipher.ENCRYPT_MODE, aesKey);
             char[] plainChars = account.toCharArray();
+            byte[] cipherBytes = aesCipher.doFinal(CharHelper.charsToBytes(plainChars));
+            String cipherText = Base64.getEncoder().encodeToString(cipherBytes);
+            Arrays.fill(plainChars, (char) 0);
 
+            FileWriter writer = new FileWriter(resultPath);
+            writer.write(wrappedKey);
+            writer.write(";");
+            writer.write(cipherText);
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | InvalidKeyException e) {
             System.err.println("This program is improperly configured. ");
             System.err.println("Please report this on https://chickenonaraft.com/");

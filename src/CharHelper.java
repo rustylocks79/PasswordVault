@@ -10,6 +10,13 @@ public class CharHelper {
         return chars;
     }
 
+    public static boolean contains(char[] chars, char search) {
+        for(char c: chars) {
+            if(c == search) return true;
+        }
+        return false;
+    }
+
     public static int indexOf(char[] chars, char c, int start) {
         for (int i = start; i < chars.length; i++) {
             if(chars[i] == c) {

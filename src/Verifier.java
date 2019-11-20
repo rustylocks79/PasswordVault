@@ -20,7 +20,7 @@ public class Verifier {
     }
 
     public boolean verify(char[] masterPassword) {
-        String checkHash = User.getSaltedMasterPasswordHash(salt, masterPassword);
+        String checkHash = User.hashSaltedMasterPassword(salt, masterPassword);
         return checkHash.equals(hash);
     }
 }
