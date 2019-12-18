@@ -1,2 +1,2 @@
 # PasswordVault
-A intentionally insecure password vault built in java.  
+This is a Computer Science Project for our CMPSC 444 Secure programming class.  
